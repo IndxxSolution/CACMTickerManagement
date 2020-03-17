@@ -2,10 +2,17 @@ from rest_framework import serializers
 from . models import *
 from django.contrib.auth.hashers import make_password
 
+class EdiFdsCacmSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EdiFdsCacm        
+        fields = "__all__"
+
+
+
 class AuthUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthUser 
-        fields = ['username', 'password', 'email', 'is_superuser', 'is_staff', 'is_active', 'date_joined'  ]
+        fields = ['username', 'password', 'email', 'is_superuser', 'is_staff', 'is_active', 'date_joined']
         extra_kwargs = {
             "password": {"write_only": True},
         }
@@ -16,11 +23,6 @@ class AuthUserSerializer(serializers.ModelSerializer):
         user.save()
         return user
       
-class EdiFdsCacmSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EdiFdsCacm        
-        fields = "__all__"
-
 class AuthPermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthPermission 
@@ -40,6 +42,9 @@ class AuthGroupSerializer(serializers.ModelSerializer):
         role = super().create(validated_data)
         role.save()
         return role
+
+
+
 
 
 class AuthGroupPermissionsSerializer(serializers.ModelSerializer):
@@ -70,14 +75,45 @@ class AuthUserGroupsSerializer(serializers.ModelSerializer):
         data.save()
         return data
 
-class AuthUserGroups2Serializer(serializers.ModelSerializer):
-    group = AuthGroupSerializer()
+class AuthUserUserPermissionsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AuthUserGroups
-        fields = ['id', 'user', 'group']
+        model = AuthUserUserPermissions
+        fields = ['id', 'user', 'permission']
+
+    def create(self, validated_data):
+        user_data = validated_data.get('user')
+        users = AuthUser.objects.get(id = user_data.id)
+        permissions_data = validated_data.get('permission')
+        permissions = AuthPermission.objects.get(id = permissions_data.id)
+        data = AuthUserUserPermissions(user=users, permission=permissions)
+        data.save()
+        return data
+
+
+
 
 class AuthGroupPermissions2Serializer(serializers.ModelSerializer):
     permission = AuthPermissionSerializer()
     class Meta:
         model = AuthGroupPermissions  
         fields = ['id', 'group', 'permission']
+
+class AuthUserGroups2Serializer(serializers.ModelSerializer):
+    group = AuthGroupSerializer()
+    class Meta:
+        model = AuthUserGroups
+        fields = ['id', 'user', 'group']
+
+class AuthUserUserPermissions2Serializer(serializers.ModelSerializer):
+    permission = AuthPermissionSerializer() 
+    class Meta:
+        model = AuthUserUserPermissions
+        fields = ['id', 'user', 'permission']
+
+
+
+class AuthUserGroups3Serializer(serializers.ModelSerializer):
+    user = AuthUserSerializer()
+    class Meta:
+        model = AuthUserGroups
+        fields = ['id', 'user', 'group']
