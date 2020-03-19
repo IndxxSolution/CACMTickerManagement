@@ -104,6 +104,7 @@ class AuthUserGroups2Serializer(serializers.ModelSerializer):
         model = AuthUserGroups
         fields = ['id', 'user', 'group']
 
+
 class AuthUserUserPermissions2Serializer(serializers.ModelSerializer):
     permission = AuthPermissionSerializer() 
     class Meta:

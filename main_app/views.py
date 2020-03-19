@@ -71,8 +71,6 @@ class Role_permission(viewsets.ModelViewSet):
 
 
 
-
-
 class Assign_role(viewsets.ModelViewSet):
     serializer_class = AuthUserGroupsSerializer
     queryset = AuthUserGroups.objects.all()
@@ -94,6 +92,28 @@ class User_role(viewsets.ModelViewSet):
 
 
 
+class Assign_user_permission(viewsets.ModelViewSet):
+    serializer_class = AuthUserUserPermissionsSerializer
+    queryset = AuthUserUserPermissions.objects.all()
+    permission_classes = (AllowAny,)
+    http_method_names = ['get', 'post','delete']
+
+class User_permission(viewsets.ModelViewSet):
+    serializer_class = AuthUserUserPermissions2Serializer
+    
+    def get_queryset(self):
+        queryset = AuthUserUserPermissions.objects.all()
+        required_user = self.request.query_params.get('required_user')
+        queryset = queryset.filter(user = required_user)
+        return queryset
+
+    permission_classes = (AllowAny,)
+    http_method_names = ['get']
+    
+
+
+
+
 class Role_user(viewsets.ModelViewSet):
     serializer_class = AuthUserGroups3Serializer
 
@@ -106,23 +126,25 @@ class Role_user(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     http_method_names = ['get']
 
+class Permission_role(viewsets.ModelViewSet):
+    serializer_class = AuthGroupPermissions2Serializer
 
+    def get_queryset(self):
+        queryset = AuthGroupPermissions.objects.all()
+        required_permission = self.request.query_params.get('required_permission')
+        queryset = queryset.filter(permission = required_permission)
+        return queryset
 
-
-
-class Assign_user_permission(viewsets.ModelViewSet):
-    serializer_class = AuthUserUserPermissionsSerializer
-    queryset = AuthUserUserPermissions.objects.all()
     permission_classes = (AllowAny,)
-    http_method_names = ['get', 'post']
+    http_method_names = ['get']
 
-class User_permission(viewsets.ModelViewSet):
+class Permission_user(viewsets.ModelViewSet):
     serializer_class = AuthUserUserPermissions2Serializer
-    
+
     def get_queryset(self):
         queryset = AuthUserUserPermissions.objects.all()
-        required_user = self.request.query_params.get('required_user')
-        queryset = queryset.filter(user = required_user)
+        required_permission = self.request.query_params.get('required_permission')
+        queryset = queryset.filter(permission = required_permission)
         return queryset
 
     permission_classes = (AllowAny,)
